@@ -5,3 +5,15 @@ export async function getAllContacts() {
 export async function getContactById(id) {
   return await Contact.findById(id);
 }
+
+export async function createContact(data) {
+  return await Contact.create(data);
+}
+
+export async function updateContact(id, data) {
+  return await Contact.findByIdAndUpdate(id, data, { new: true });
+}
+
+export async function deleteContact(id) {
+  return await Contact.findByIdAndDelete(id);
+}
