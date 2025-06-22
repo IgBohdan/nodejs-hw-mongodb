@@ -1,18 +1,57 @@
 import createError from 'http-errors';
+
 import {
   createContact,
   deleteContact,
-  getAllContacts,
   getContactById,
+  getPaginatedContacts,
   updateContact,
 } from '../services/contacts.js';
+import { contactQueryParams } from '../utils/contactQueryParams.js';
 
 export async function getContacts(req, res) {
-  const contacts = await getAllContacts();
+  const { page, perPage, filter, sort, skip } = contactQueryParams(req.query);
+
+  const { contacts, totalItems } = await getPaginatedContacts({
+    filter,
+    sort,
+    skip,
+    perPage,
+  });
+
+  const totalPages = Math.ceil(totalItems / perPage);
+  const hasPreviousPage = page > 1;
+  const hasNextPage = page < totalPages;
+
+  if (totalItems === 0) {
+    res.status(200).json({
+      status: 200,
+      message: 'No contacts found matching the criteria',
+      data: {
+        data: [],
+        page,
+        perPage,
+        totalItems: 0,
+        totalPages: 0,
+        hasPreviousPage: false,
+        hasNextPage: false,
+      },
+    });
+    return;
+  }
+
   res.status(200).json({
     status: 200,
     message: 'Successfully found contacts!',
-    data: contacts,
+    data: {
+      data: contacts,
+      page,
+      perPage,
+      totalItems,
+      totalPages,
+      hasPreviousPage,
+      hasNextPage,
+    },
   });
 }
 

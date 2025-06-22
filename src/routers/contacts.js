@@ -1,5 +1,4 @@
 import express from 'express';
-import { ctrlWrapper } from '../utils/ctrlWrapper.js';
 
 import {
   createContactController,
@@ -8,13 +7,29 @@ import {
   getContacts,
   updateContactController,
 } from '../controllers/contacts.js';
+import { isValidId } from '../middlewares/isValidId.js';
+import { validateBody } from '../middlewares/validateBody.js';
+import { ctrlWrapper } from '../utils/ctrlWrapper.js';
+import {
+  createContactSchema,
+  updateContactSchema,
+} from '../validation/contacts.js';
 
 const router = express.Router();
 
 router.get('/', ctrlWrapper(getContacts));
-router.get('/:contactId', ctrlWrapper(getContactByIdController));
-router.post('/', ctrlWrapper(createContactController));
-router.patch('/:contactId', ctrlWrapper(updateContactController));
-router.delete('/:contactId', ctrlWrapper(deleteContactController));
+router.get('/:contactId', isValidId, ctrlWrapper(getContactByIdController));
+router.post(
+  '/',
+  validateBody(createContactSchema),
+  ctrlWrapper(createContactController)
+);
+router.patch(
+  '/:contactId',
+  isValidId,
+  validateBody(updateContactSchema),
+  ctrlWrapper(updateContactController)
+);
+router.delete('/:contactId', isValidId, ctrlWrapper(deleteContactController));
 
 export const contactsRouter = router;
