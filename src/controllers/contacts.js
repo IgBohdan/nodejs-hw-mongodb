@@ -10,6 +10,7 @@ import {
 import { contactQueryParams } from '../utils/contactQueryParams.js';
 
 export async function getContacts(req, res) {
+  const userId = req.user._id;
   const { page, perPage, filter, sort, skip } = contactQueryParams(req.query);
 
   const { contacts, totalItems } = await getPaginatedContacts({
@@ -17,6 +18,7 @@ export async function getContacts(req, res) {
     sort,
     skip,
     perPage,
+    userId,
   });
 
   const totalPages = Math.ceil(totalItems / perPage);
@@ -57,7 +59,8 @@ export async function getContacts(req, res) {
 
 export async function getContactByIdController(req, res, next) {
   const { contactId } = req.params;
-  const contact = await getContactById(contactId);
+  const userId = req.user._id;
+  const contact = await getContactById(contactId, userId);
 
   if (!contact) {
     throw createError(404, 'Contact not found');
@@ -71,6 +74,7 @@ export async function getContactByIdController(req, res, next) {
 }
 
 export async function createContactController(req, res, next) {
+  const userId = req.user._id;
   const { name, phoneNumber, email, isFavourite, contactType } = req.body;
 
   if (!name || !phoneNumber || !contactType) {
@@ -80,13 +84,16 @@ export async function createContactController(req, res, next) {
     );
   }
 
-  const contact = await createContact({
-    name,
-    phoneNumber,
-    email,
-    isFavourite,
-    contactType,
-  });
+  const contact = await createContact(
+    {
+      name,
+      phoneNumber,
+      email,
+      isFavourite,
+      contactType,
+    },
+    userId
+  );
 
   res.status(201).json({
     status: 201,
@@ -97,13 +104,14 @@ export async function createContactController(req, res, next) {
 
 export async function updateContactController(req, res, next) {
   const { contactId } = req.params;
+  const userId = req.user._id;
   const updateData = req.body;
 
   if (Object.keys(updateData).length === 0) {
     throw createError(400, 'At least one field must be provided for update');
   }
 
-  const contact = await updateContact(contactId, updateData);
+  const contact = await updateContact(contactId, updateData, userId);
 
   if (!contact) {
     throw createError(404, 'Contact not found');
@@ -118,7 +126,8 @@ export async function updateContactController(req, res, next) {
 
 export async function deleteContactController(req, res, next) {
   const { contactId } = req.params;
-  const contact = await deleteContact(contactId);
+  const userId = req.user._id;
+  const contact = await deleteContact(contactId, userId);
 
   if (!contact) {
     throw createError(404, 'Contact not found');

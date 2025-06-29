@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import pino from 'pino';
@@ -5,6 +6,7 @@ import pinoHttp from 'pino-http';
 
 import { errorHandler } from './middlewares/errorHandler.js';
 import { notFoundHandler } from './middlewares/notFoundHandler.js';
+import { authRouter } from './routers/auth.js';
 import { contactsRouter } from './routers/contacts.js';
 import { getEnvVar } from './utils/getEnvVar.js';
 
@@ -15,8 +17,10 @@ export function setupServer() {
   app.use(cors());
   app.use(express.json());
   app.use(pinoHttp({ logger }));
+  app.use(cookieParser());
 
   app.use('/contacts', contactsRouter);
+  app.use('/auth', authRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
+
 import { getEnvVar } from '../utils/getEnvVar.js';
+
 export async function initMongoConnection() {
   try {
     const MONGODB_USER = getEnvVar('MONGODB_USER');

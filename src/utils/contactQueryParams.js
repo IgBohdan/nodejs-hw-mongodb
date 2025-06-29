@@ -9,7 +9,7 @@ export function contactQueryParams(query) {
     type,
     isFavourite,
   } = query;
-
+  console.log(page, perPage, sortBy, sortOrder, type, isFavourite);
   const pageNum = parseInt(page, 10);
   const perPageNum = parseInt(perPage, 10);
   const validSortFields = ['name', 'phoneNumber', 'email', 'contactType'];

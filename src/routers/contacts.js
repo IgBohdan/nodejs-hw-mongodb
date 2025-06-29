@@ -7,6 +7,7 @@ import {
   getContacts,
   updateContactController,
 } from '../controllers/contacts.js';
+import { authenticate } from '../middlewares/authentication.js';
 import { isValidId } from '../middlewares/isValidId.js';
 import { validateBody } from '../middlewares/validateBody.js';
 import { ctrlWrapper } from '../utils/ctrlWrapper.js';
@@ -17,6 +18,7 @@ import {
 
 const router = express.Router();
 
+router.use(authenticate);
 router.get('/', ctrlWrapper(getContacts));
 router.get('/:contactId', isValidId, ctrlWrapper(getContactByIdController));
 router.post(
