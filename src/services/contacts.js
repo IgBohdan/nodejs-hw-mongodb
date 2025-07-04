@@ -1,4 +1,6 @@
+import createError from 'http-errors';
 import { Contact } from '../models/contact.js';
+import { uploadPhoto } from './cloudinary.js';
 
 export function getAllContacts(userId) {
   return Contact.find({ userId });
@@ -32,14 +34,38 @@ export async function getContactById(id, userId) {
   return await Contact.findOne({ _id: id, userId });
 }
 
-export async function createContact(data, userId) {
-  return await Contact.create({ ...data, userId });
+export async function createContact(payload, userId, file) {
+  let photoUrl;
+  if (file) {
+    photoUrl = await uploadPhoto(file);
+  }
+
+  const contact = await Contact.create({
+    ...payload,
+    userId,
+    photo: photoUrl,
+  });
+
+  return contact;
 }
 
-export async function updateContact(id, data, userId) {
-  return await Contact.findOneAndUpdate({ _id: id, userId }, data, {
-    new: true,
-  });
+export async function updateContact(contactId, userId, payload, file) {
+  let photoUrl;
+  if (file) {
+    photoUrl = await uploadPhoto(file);
+  }
+
+  const contact = await Contact.findOneAndUpdate(
+    { _id: contactId, userId },
+    { ...payload, ...(photoUrl && { photo: photoUrl }) },
+    { new: true }
+  );
+
+  if (!contact) {
+    throw createError(404, 'Contact not found');
+  }
+
+  return contact;
 }
 
 export async function deleteContact(id, userId) {

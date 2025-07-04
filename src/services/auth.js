@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { Session } from '../models/session.js';
 import { User } from '../models/user.js';
 import { getEnvVar } from '../utils/getEnvVar.js';
+import { sendResetPasswordEmail } from './email.js';
 
 const JWT_SECRET = getEnvVar('JWT_SECRET');
 
@@ -94,4 +95,43 @@ export async function refreshSession(refreshToken) {
 
 export async function logoutUser(refreshToken) {
   await Session.deleteOne({ refreshToken });
+}
+
+export async function sendResetEmail(email) {
+  const user = await User.findOne({ email });
+  if (!user) {
+    throw createError(404, 'User not found!');
+  }
+
+  const token = jwt.sign({ email }, getEnvVar('JWT_SECRET'), {
+    expiresIn: '5m',
+  });
+
+  try {
+    await sendResetPasswordEmail(email, token);
+    return true;
+  } catch (error) {
+    throw createError(500, 'Failed to send the email, please try again later.');
+  }
+}
+
+export async function resetPassword(token, newPassword) {
+  let decoded;
+  try {
+    decoded = jwt.verify(token, getEnvVar('JWT_SECRET'));
+  } catch (err) {
+    throw createError(401, 'Token is expired or invalid.');
+  }
+
+  const user = await User.findOne({ email: decoded.email });
+  if (!user) {
+    throw createError(404, 'User not found!');
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  await User.updateOne({ email: decoded.email }, { password: hashedPassword });
+
+  await Session.deleteMany({ userId: user._id });
+
+  return true;
 }

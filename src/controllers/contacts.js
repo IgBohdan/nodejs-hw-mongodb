@@ -92,7 +92,8 @@ export async function createContactController(req, res, next) {
       isFavourite,
       contactType,
     },
-    userId
+    userId,
+    req.file
   );
 
   res.status(201).json({
@@ -111,7 +112,7 @@ export async function updateContactController(req, res, next) {
     throw createError(400, 'At least one field must be provided for update');
   }
 
-  const contact = await updateContact(contactId, updateData, userId);
+  const contact = await updateContact(contactId, userId, updateData, req.file);
 
   if (!contact) {
     throw createError(404, 'Contact not found');
