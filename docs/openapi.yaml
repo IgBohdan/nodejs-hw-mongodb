@@ -1,0 +1,42 @@
+openapi: 3.1.0
+info:
+  version: 1.0.0
+  title: Contact Management API
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  description: A REST API for managing user contacts with authentication and file upload support.
+tags:
+  - name: Contacts
+    description: Operations related to contact management
+servers:
+  - url: http://localhost:4000
+  - url: https://your-deployed-api.com
+paths:
+  /contacts:
+    $ref: './swagger/paths/contacts/get.yaml'
+  /contacts/{contactId}:
+    $ref: './swagger/paths/contacts/{id}/get.yaml'
+  /contacts/{contactId}/patch:
+    $ref: './swagger/paths/contacts/{id}/patch.yaml'
+  /contacts/{contactId}/delete:
+    $ref: './swagger/paths/contacts/{id}/delete.yaml'
+  /contacts/post:
+    $ref: './swagger/paths/contacts/post.yaml'
+  /auth/register:
+    $ref: ./swagger/paths/auth/register.yaml
+  /auth/login:
+    $ref: ./swagger/paths/auth/login.yaml
+  /auth/refresh:
+    $ref: ./swagger/paths/auth/refresh.yaml
+  /auth/logout:
+    $ref: ./swagger/paths/auth/logout.yaml
+  /auth/send-reset-email:
+    $ref: ./swagger/paths/auth/send-reset-email.yaml
+  /auth/reset-pwd:
+    $ref: ./swagger/paths/auth/reset-pwd.yaml
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer

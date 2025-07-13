@@ -1,0 +1,15 @@
+post:
+  tags:
+    - Authentication
+  summary: Log out a user
+  operationId: logoutUser
+  description: Logs out the user by invalidating the refresh token and clearing the refresh token cookie.
+  responses:
+    '204':
+      description: Successfully logged out the user
+    '401':
+      description: Refresh token not provided
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas.yaml#/components/schemas/Error'

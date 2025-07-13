@@ -1,0 +1,66 @@
+post:
+  tags:
+    - Authentication
+  summary: Reset user password
+  operationId: resetPassword
+  description: Resets the user's password using a valid reset token received via email and a new password.
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - token
+            - password
+          properties:
+            token:
+              type: string
+              description: The password reset token received via email
+              example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+            password:
+              type: string
+              minLength: 6
+              description: The new password for the user
+              example: newSecurePassword123
+  responses:
+    '200':
+      description: Password successfully reset
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas.yaml#/components/schemas/ResetResponse'
+          example:
+            status: 200
+            message: Password has been successfully reset.
+            data: {}
+    '400':
+      description: Invalid or missing request body fields
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas.yaml#/components/schemas/Error'
+          example:
+            status: 400
+            message: Something went wrong
+            data: '"password" is required'
+    '401':
+      description: Invalid or expired reset token
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas.yaml#/components/schemas/Error'
+          example:
+            status: 401
+            message: Something went wrong
+            data: Token is expired or invalid.
+    '404':
+      description: User associated with the token not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas.yaml#/components/schemas/Error'
+          example:
+            status: 404
+            message: Something went wrong
+            data: User not found!

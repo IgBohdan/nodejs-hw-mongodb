@@ -1,0 +1,25 @@
+post:
+  tags:
+    - Authentication
+  summary: Refresh user session
+  operationId: refreshSession
+  description: Refreshes the user session using a refresh token cookie, returning a new access token and updating the refresh token cookie.
+  responses:
+    '200':
+      description: Successfully refreshed a session
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas.yaml#/components/schemas/AuthResponse'
+      headers:
+        Set-Cookie:
+          schema:
+            type: string
+            example: refreshToken=abc123; HttpOnly; Secure; Max-Age=2592000000
+          description: Updates the refresh token cookie
+    '401':
+      description: Refresh token not provided or invalid
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas.yaml#/components/schemas/Error'

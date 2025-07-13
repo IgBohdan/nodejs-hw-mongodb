@@ -1,0 +1,59 @@
+post:
+  tags:
+    - Contacts
+  summary: Create a new contact
+  operationId: createContact
+  description: Creates a new contact for the authenticated user, with an optional photo upload.
+  security:
+    - bearerAuth: []
+  requestBody:
+    required: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          required:
+            - name
+            - phoneNumber
+            - contactType
+          properties:
+            name:
+              type: string
+              minLength: 3
+              maxLength: 20
+              description: The name of the contact
+            phoneNumber:
+              type: string
+              minLength: 3
+              maxLength: 20
+              description: The phone number of the contact
+            email:
+              type: string
+              format: email
+              minLength: 3
+              maxLength: 20
+              description: The email address of the contact
+            isFavourite:
+              type: boolean
+              description: Indicates if the contact is marked as favorite
+            contactType:
+              type: string
+              enum: [work, home, personal]
+              description: The type of contact
+            photo:
+              type: string
+              format: binary
+              description: The contact's photo file
+  responses:
+    '201':
+      description: Successfully created a contact
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas.yaml#/components/schemas/ContactResponse'
+    '400':
+      description: Missing required fields
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/schemas.yaml#/components/schemas/Error'
